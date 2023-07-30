@@ -4,10 +4,42 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
+const session = require("express-session");
+const passport = require("passport");
+
+const connection = require('./config/database');
+
 const indexRouter = require('./routes/index');
 const apiRouter = require('./routes/api');
 
+// Package documentation - https://www.npmjs.com/package/connect-mongo
+const MongoStore = require('connect-mongo');
+
 const app = express();
+
+const sessionStore = MongoStore.create({mongoUrl: process.env.mongoURL, collection: 'sessions'})
+
+app.set('view engine', 'html');
+
+//passport set up
+app.use(session({
+  secret: process.env.SECRET,
+  resave: false,
+  saveUninitialized: true,
+  store: sessionStore,
+}));
+
+// must require passport config file so whole app knows about it
+require('./config/passport');
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use((req, res, next) => {
+  // console.log(req.session);
+  console.log(req.user);
+  next()
+})
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -31,7 +63,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.json({err});
 });
 
 module.exports = app;
