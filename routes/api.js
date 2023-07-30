@@ -6,15 +6,15 @@ const comment_controller = require('../controllers/commentController');
 const auth_controller = require('../controllers/authController');
 
 //post api
-router.get('/posts', post_controller.get_posts)
+router.get('/posts', post_controller.getPosts)
 
-router.get('/post/:id', post_controller.get_post);
+router.get('/post/:id', post_controller.getPost);
 
-router.post('/post/:id', post_controller.post_post);
+router.post('/post/:id', post_controller.postPost);
 
-router.put('/post/:id', post_controller.update_post);
+router.put('/post/:id', post_controller.updatePost);
 
-router.delete('/post/:id', post_controller.delete_post);
+router.delete('/post/:id', post_controller.deletePost);
 
 
 // comment api

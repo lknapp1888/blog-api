@@ -120,7 +120,7 @@ const { findByIdAndUpdate } = require('./models/post');
         postId,
     });
     await comment.save();
-    await Post.findByIdAndUpdate(postId, {$push: {"comments": comment}}, {})
+    await Post.findByIdAndUpdate(postId, {$push: {"comments": comment._id}}, {})
     comments[index] = comment;
     console.log(`Added comment: ${comment.title}`)
   };
