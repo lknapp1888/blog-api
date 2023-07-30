@@ -62,16 +62,17 @@ exports.signup = [
         } else {
           // Data from form is valid. Save user.
           await user.save();
-          res.json({
+          res.status(200).json({
             success: true,
-            message: "Logged in successfully",
+            message: "User creation successful",
             data: {
               userId: user._id,
               username: user.email,
-              admin: user.admin,
-              createdAt: user.registered,
+              isAdmin: user.admin,
+              createdAt: user.registered.toISOString(), // Format the date in ISO 8601
             },
           });
+          
         }
       } catch (err) {
         return next(err);
@@ -109,28 +110,31 @@ exports.logout = asyncHandler(async (req, res, next) => {
     if (err) {
       return next(err);
     }
-    res.json({
-        success: true,
-        message: "user logged out",
-      });
+    res.status(200).json({
+      success: true,
+      message: "User successfully logged out.",
+    });
+    
   });
 });
 
 exports.getLogInStatus = asyncHandler(async (req, res, next) => {
         if (req.user) {
-          res.json({
+          res.status(200).json({
             success: true,
-            message: "user logged in",
+            message: "User successfully logged in.",
             data: {
               userId: req.user._id,
               username: req.user.email,
-              admin: req.user.admin,
+              isAdmin: req.user.admin,
             },
           });
+          
         } else {
-            res.json({
-                success: false,
-                message: "No user logged in",
-              });
+          res.status(401).json({
+            success: false,
+            message: "No user logged in.",
+          });
+          
         }
 })

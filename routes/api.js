@@ -18,9 +18,9 @@ router.delete('/post/:id', post_controller.deletePost);
 
 
 // comment api
-router.post('/post/:id/comment', comment_controller.post_comment);
+router.post('/post/:id/comment', comment_controller.postComment);
 
-router.delete('/post/:id/comment/:id', comment_controller.delete_comment);
+router.delete('/post/:id/comment/:id', comment_controller.deleteComment);
 
 module.exports = router;
 
