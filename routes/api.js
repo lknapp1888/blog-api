@@ -10,7 +10,7 @@ router.get('/posts', post_controller.getPosts)
 
 router.get('/post/:id', post_controller.getPost);
 
-router.post('/post/:id', post_controller.postPost);
+router.post('/post', post_controller.postPost);
 
 router.put('/post/:id', post_controller.updatePost);
 

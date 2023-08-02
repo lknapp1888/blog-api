@@ -12,10 +12,18 @@ exports.postComment = [
                 status: "fail",
                 error: "unauthorized",
                 message: "User not logged in or session expired. Please log in to access this resource.",
-              });              
+              });  
+              return            
         }
         next()
     },
+    body('title').trim()
+    .isLength({ min: 1, max:150 })
+    .escape(),
+    body('text').trim()
+    .isLength({ min: 1, max:5000 })
+    .escape(),
+
     asyncHandler(async (req, res, next) => {
     try {
       const [author, post] = await Promise.all([
