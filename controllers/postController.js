@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const Post = require("../models/post");
 const Comment = require("../models/comment");
 const { body, validationResult } = require("express-validator");
+const { userCheck, adminCheck } = require("../middleware/authMiddleware");
 
 exports.getPosts = asyncHandler(async (req, res, next) => {
   try {
@@ -40,31 +41,8 @@ exports.getPost = asyncHandler(async (req, res, next) => {
 });
 
 exports.postPost = [
-  // Verify that user is logged in
-  (req, res, next) => {
-    if (req.user === undefined) {
-        res.status(401).json({
-            status: "fail",
-            error: "unauthorized",
-            message: "User not logged in or session expired. Please log in to access this resource.",
-          });  
-          return            
-    }
-    next()
-},
-
-  //verify that user is admin
-(req, res, next) => {
-  if (!req.user.admin) {
-      res.status(401).json({
-          status: "fail",
-          error: "unauthorized",
-          message: "User is not administrator - cannot send post",
-        });  
-        return            
-  }
-  next()
-},
+  userCheck,
+  adminCheck,
 
   //sanitize data
   body('title', 'title must be between 1 and 150 characters').trim()
@@ -102,10 +80,62 @@ asyncHandler(async (req, res, next) => {
 
 ];
 
-exports.updatePost = asyncHandler(async (req, res, next) => {
-  res.send("update (PUT) post data - not implemented");
-});
+exports.updatePost = [
+  userCheck,
+  adminCheck,
 
-exports.deletePost = asyncHandler(async (req, res, next) => {
-  res.send("delete (DELETE) post data - not implemented");
-});
+  //sanitize data
+  body('title', 'title must be between 1 and 150 characters').trim()
+  .isLength({ min: 1, max:150 })
+  .escape(),
+  body('text',  'title must be between 1 and 5000 characters').trim()
+  .isLength({ min: 1, max:5000 })
+  .escape(),
+
+  // check that post exists
+  asyncHandler(async (req, res, next) => { 
+
+  // Extract the validation errors from a request.
+  const errors = validationResult(req);
+
+  const post = await Post.findById(req.params.id).exec();
+
+  if (post === null) {
+    res.status(404).json({
+      success: false,
+      message: "Post not found.",
+      error: errors.array(),
+    })
+  } else {
+    const updatedPost = new Post({
+      _id: req.params.id, // This is required, or a new ID will be assigned!
+      title: req.body.title,
+      text: req.body.text,
+    })
+    await Post.findByIdAndUpdate(req.params.id, updatedPost, {});
+    res.status(200).json({ status: "success", data: { updatedPost } });
+  }
+  }),
+]
+
+exports.deletePost = [
+userCheck,
+adminCheck,
+
+asyncHandler(async (req, res, next) => {
+  const post = await Post.findById(req.params.id).exec();
+
+  if (post === null) {
+    res.status(404).json({
+      success: false,
+      message: "Post not found.",
+    })
+  } else {
+    await Post.findByIdAndRemove(req.params.id);
+    res.status(200).json({
+      success: true,
+      message: 'post successfully deleted'
+    })
+  }
+}),
+]

@@ -4,19 +4,10 @@ const User = require("../models/user");
 const Post = require("../models/post");
 
 const { body, validationResult } = require("express-validator");
+const { userCheck } = require("../middleware/authMiddleware");
 
 exports.postComment = [
-    (req, res, next) => {
-        if (req.user === undefined) {
-            res.status(401).json({
-                status: "fail",
-                error: "unauthorized",
-                message: "User not logged in or session expired. Please log in to access this resource.",
-              });  
-              return            
-        }
-        next()
-    },
+    userCheck,
     body('title').trim()
     .isLength({ min: 1, max:150 })
     .escape(),
