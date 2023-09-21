@@ -25,6 +25,6 @@ Node.js, Express, Passport, MongoDB, Mongoose, Postman
 The main challenge was implementing full user authentication and seeking to the fully understand the process (e.g. using a session, the encryption process)
 
 The initial application set up also required due consideration as to correctly synchronise the database, authentication, middleware etc.)
-## Improvements
+## Potential improvements
 
 - Build a front-end (or two front ends. One for authoring and editing posts and another for general users to view the blog)
